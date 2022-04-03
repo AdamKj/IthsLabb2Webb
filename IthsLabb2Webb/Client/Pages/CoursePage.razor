@@ -1,0 +1,59 @@
+﻿@page "/course"
+@inject HttpClient _http
+
+<h2>Create a new Course</h2>
+
+<EditForm Model="@_course" OnValidSubmit="OnValidCourseSubmit">
+    <DataAnnotationsValidator/>
+    <MudGrid>
+        <MudItem xs="12" sm="7">
+            <MudCard>
+                <MudCardContent>
+                    <MudTextField Label="Title"
+                                  @bind-Value="_course.Title" For="@(() => _course.Title)"/>
+                    <MudTextField Label="Description" Class="mt-3"
+                                  @bind-Value="_course.Description" For="@(() => _course.Description)"/>
+                    <MudTextField Label="Length" Class="mt-3" HelperText="i.e 30p"
+                                  @bind-Value="_course.CourseLength" For="@(() => _course.CourseLength)" />
+                    <MudTextField Label="Level" Class="mt-3" HelperText="Beginner, Intermediate or Advanced"
+                                  @bind-Value="_course.Level" For="@(() => _course.Level)" />
+                </MudCardContent>
+                <MudCardActions>
+                    <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary" Class="ml-auto">Register</MudButton>
+                </MudCardActions>
+            </MudCard>
+        </MudItem>
+        <MudItem xs="12" sm="5">
+            <MudPaper Class="pa-4 mud-height-full">
+                <MudText Typo="Typo.subtitle2">Validation Summary</MudText>
+                @if (_success)
+                {
+                    <MudText Color="Color.Success">Success</MudText>
+                }
+                else
+                {
+                    <MudText Color="@Color.Error">
+                        <ValidationSummary />
+                    </MudText>
+                }
+            </MudPaper>
+        </MudItem>
+        <MudItem xs="12">
+            <MudText Typo="Typo.body2" Align="Align.Center">
+                Fill out the form correctly to see the success message.
+            </MudText>
+        </MudItem>
+    </MudGrid>
+</EditForm>
+
+@code {
+    Course _course = new();
+    bool _success;
+
+    private async Task OnValidCourseSubmit()
+    {
+        await _http.PostAsJsonAsync("api/Course", _course);
+        _success = true;
+        StateHasChanged();
+    }
+}

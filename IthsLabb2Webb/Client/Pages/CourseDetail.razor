@@ -1,0 +1,57 @@
+﻿@page "/api/Course/{id:int}"
+@inject HttpClient _http
+@inject IDialogService _dialogService
+
+<h1>Course Detail</h1>
+
+<MudCard>
+    <MudCardHeader>
+        <CardHeaderContent>
+            <MudText Typo="Typo.h6">@_course.Title</MudText>
+        </CardHeaderContent>
+    </MudCardHeader>
+    <MudCardContent>
+        <MudText>@_course.Description</MudText>
+        <MudText Typo="Typo.body2">@_course.Level @_course.CourseLength</MudText>
+    </MudCardContent>
+    <MudCardActions>
+    </MudCardActions>
+</MudCard>
+
+<h2 class="mt-4">Enroll for @_course.Title</h2>
+
+<EditForm Model="@_course" OnValidSubmit="Submit">
+    <DataAnnotationsValidator/>
+    <MudGrid>
+        <MudItem xs="12" sm="7">
+            <MudCard>
+                <MudCardContent>
+                    <MudTextField Label="Enter your Email"
+                                  @bind-Value="_user.Email" For="@(() => _user.Email)" Required="true"/>
+                </MudCardContent>
+                <MudCardActions>
+                    <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary" Class="ml-auto">Register</MudButton>
+                </MudCardActions>
+            </MudCard>
+        </MudItem>
+    </MudGrid>
+</EditForm>
+
+
+@code {
+    [Parameter]
+    public int Id { get; set; }
+
+    Course _course = new();
+    User _user = new();
+
+    protected override async Task OnParametersSetAsync()
+    {
+        _course = await _http.GetFromJsonAsync<Course>($"api/Course/{Id}");
+    }
+    
+    async Task Submit()
+    {
+        await _http.PostAsJsonAsync($"api/Course/{Id}", _user);
+    }
+}

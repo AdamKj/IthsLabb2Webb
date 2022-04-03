@@ -1,0 +1,79 @@
+﻿@page "/api/edit-course/{id:int}"
+@inject HttpClient _http
+@inject NavigationManager _navigationManager
+
+<h2>Edit Course: @_course.Title</h2>
+
+<EditForm Model="@_course" OnValidSubmit="OnValidUserSubmit">
+    <DataAnnotationsValidator/>
+    <MudGrid>
+        <MudItem xs="12" sm="7">
+            <MudCard>
+                <MudCardContent>
+                    <MudTextField Label="Title" Required="true"
+                                  @bind-Value="_course.Title" For="@(() => _course.Title)"/>
+                    <MudTextField Label="Description" Class="mt-3" Required="true"
+                                  @bind-Value="_course.Description" For="@(() => _course.Description)"/>
+                    <MudTextField Label="Length" Class="mt-3" Required="true"
+                                  @bind-Value="_course.CourseLength" For="@(() => _course.CourseLength)" />
+                    <MudTextField Label="Level" Class="mt-3"  Required="true"
+                                  @bind-Value="_course.Level" For="@(() => _course.Level)" />
+                    <MudCheckBox Label="Status" T="bool" Class="mt-3"  Required="true"
+                                  @bind-Value="_course.Status" For="@(() => _course.Status)" />
+                </MudCardContent>
+                <MudCardActions>
+                    <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary" Class="ml-auto">Register</MudButton>
+                    <MudButton Variant="Variant.Filled" Color="Color.Error" OnClick="() => DeleteCourse(_course.Id)" Class="ml-auto">Delete</MudButton>
+                </MudCardActions>
+            </MudCard>
+        </MudItem>
+        <MudItem xs="12" sm="5">
+            <MudPaper Class="pa-4 mud-height-full">
+                <MudText Typo="Typo.subtitle2">Validation Summary</MudText>
+                @if (_success)
+                {
+                    <MudText Color="Color.Success">Success</MudText>
+                }
+                else
+                {
+                    <MudText Color="@Color.Error">
+                        <ValidationSummary />
+                    </MudText>
+                }
+            </MudPaper>
+        </MudItem>
+        <MudItem xs="12">
+            <MudText Typo="Typo.body2" Align="Align.Center">
+                Fill out the form correctly to see the success message.
+            </MudText>
+        </MudItem>
+    </MudGrid>
+</EditForm>
+
+@code {
+    [Parameter]
+    public int Id { get; set; }
+
+    Course _course = new();
+    bool _success;
+
+    protected override async Task OnParametersSetAsync()
+    {
+        _course = await _http.GetFromJsonAsync<Course>($"api/Course/{Id}");
+    }
+
+    private async Task OnValidUserSubmit()
+    {
+        await _http.PutAsJsonAsync("api/Course", _course);
+        _success = true;
+        StateHasChanged();
+    }
+
+    private async Task DeleteCourse(int id)
+    {
+        await _http.DeleteAsync($"api/Course/{id}");
+        _navigationManager.NavigateTo("/");
+        StateHasChanged();
+    }
+
+}

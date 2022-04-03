@@ -1,0 +1,45 @@
+﻿@page "/"
+@inject HttpClient _http
+@inject NavigationManager _navigationManager
+
+<PageTitle>Index</PageTitle>
+
+<MudItem xs="12" sm="9">
+    <MudGrid>
+        @foreach (var course in Courses)
+        {
+            <MudItem xs="12" sm="4">
+                <MudCard>
+                    <MudCardContent>
+                        <MudText Typo="Typo.h5">@course.Title</MudText>
+                        <MudText Typo="Typo.body2">@course.Level </MudText>
+                    </MudCardContent>
+                    <MudCardActions>
+                        <MudButton Variant="Variant.Text" Color="Color.Primary" OnClick="() => DetailsPage(course.Id)">More Info</MudButton>
+                        <MudButton Variant="Variant.Text" Color="Color.Primary" OnClick="() => EditCourse(course.Id)">Edit Course</MudButton>
+                    </MudCardActions>
+                </MudCard> 
+            </MudItem>
+        }
+    </MudGrid>
+</MudItem>
+
+@code
+{
+    List<Course> Courses { get; set; } = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        Courses = await _http.GetFromJsonAsync<List<Course>>("api/Course");
+    }
+
+    private void DetailsPage(int id)
+    {
+        _navigationManager.NavigateTo($"api/Course/{id}");
+    }
+
+    private void EditCourse(int id)
+    {
+        _navigationManager.NavigateTo($"api/edit-course/{id}");
+    }
+}

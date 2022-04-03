@@ -1,0 +1,56 @@
+﻿@page "/users"
+@inject HttpClient _http
+@inject NavigationManager _navigationManager
+
+<h1>Get All Users</h1>
+
+<MudItem xs="12" sm="9">
+    <MudGrid>
+        @foreach (var user in Users)
+        {
+            <MudItem xs="12" sm="4">
+                <MudCard>
+                    <MudCardContent>
+                        <MudText Typo="Typo.h5">Name: @user.FirstName @user.LastName</MudText>
+                        <MudText Typo="Typo.body2">Email: @user.Email </MudText>
+                        <MudText Typo="Typo.body1">Phone: @user.Phone </MudText>
+                        <MudText Typo="Typo.body2">Address: @user.Address.Street | @user.Address.Zip | @user.Address.City</MudText>
+                        @foreach (var course in Courses)
+                        {
+                            <MudText Typo="Typo.body1">@course</MudText>
+                        }
+                    </MudCardContent>
+                    <MudCardActions>
+                        <MudButton Variant="Variant.Text" Color="Color.Primary" OnClick="() => EditUser(user.Id)">Edit User</MudButton>
+                        <MudButton Variant="Variant.Filled" Color="Color.Error" OnClick="() => DeleteUser(user.Id)" Class="ml-auto">Delete</MudButton>
+                    </MudCardActions>
+                </MudCard> 
+            </MudItem>
+        }
+    </MudGrid>
+</MudItem>
+
+@code {
+    List<User> Users { get; set; } = new();
+    List<Course> Courses { get; set; } = new();
+    User _user = new();
+    Course _course = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        Users = await _http.GetFromJsonAsync<List<User>>("api/User");
+        Courses = _user.Courses;
+    }
+
+    private void EditUser(int id)
+    {
+        _navigationManager.NavigateTo($"/api/edit-user/{id}");
+    }
+
+    private async Task DeleteUser(int id)
+    {
+        await _http.DeleteAsync($"api/User/{id}");
+        _navigationManager.NavigateTo("/");
+        StateHasChanged();
+    }
+}

@@ -1,0 +1,65 @@
+﻿@page "/user"
+@inject HttpClient _http
+
+<h2>Create a new User</h2>
+
+<EditForm Model="@_user" OnValidSubmit="OnValidUserSubmit">
+    <DataAnnotationsValidator/>
+    <MudGrid>
+        <MudItem xs="12" sm="7">
+            <MudCard>
+                <MudCardContent>
+                    <MudTextField Label="First Name"
+                                  @bind-Value="_user.FirstName" For="@(() => _user.FirstName)"/>
+                    <MudTextField Label="Last Name" Class="mt-3"
+                                  @bind-Value="_user.LastName" For="@(() => _user.LastName)"/>
+                    <MudTextField Label="Email" Class="mt-3" InputType="InputType.Email"
+                                  @bind-Value="_user.Email" For="@(() => _user.Email)" />
+                    <MudTextField Label="Phone" Class="mt-3" InputType="InputType.Telephone"
+                                  @bind-Value="_user.Phone" For="@(() => _user.Phone)" />
+                    <MudTextField Label="Street Address" Class="mt-3" 
+                                  @bind-Value="_user.Address.Street" For="@(() => _user.Address.Street)" />
+                    <MudTextField Label="Zip Code" Class="mt-3"
+                                  @bind-Value="_user.Address.Zip" For="@(() => _user.Address.Zip)" />
+                    <MudTextField Label="City" Class="mt-3" 
+                                  @bind-Value="_user.Address.City" For="@(() => _user.Address.City)" />
+                </MudCardContent>
+                <MudCardActions>
+                    <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary" Class="ml-auto">Register</MudButton>
+                </MudCardActions>
+            </MudCard>
+        </MudItem>
+        <MudItem xs="12" sm="5">
+            <MudPaper Class="pa-4 mud-height-full">
+                <MudText Typo="Typo.subtitle2">Validation Summary</MudText>
+                @if (_success)
+                {
+                    <MudText Color="Color.Success">Success</MudText>
+                }
+                else
+                {
+                    <MudText Color="@Color.Error">
+                        <ValidationSummary />
+                    </MudText>
+                }
+            </MudPaper>
+        </MudItem>
+        <MudItem xs="12">
+            <MudText Typo="Typo.body2" Align="Align.Center">
+                Fill out the form correctly to see the success message.
+            </MudText>
+        </MudItem>
+    </MudGrid>
+</EditForm>
+
+@code {
+    User _user = new();
+    bool _success;
+
+    private async Task OnValidUserSubmit()
+    {
+        await _http.PostAsJsonAsync("api/User", _user);
+        _success = true;
+        StateHasChanged();
+    }
+}
