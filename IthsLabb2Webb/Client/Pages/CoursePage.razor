@@ -19,7 +19,7 @@
                                   @bind-Value="_course.Level" For="@(() => _course.Level)" />
                 </MudCardContent>
                 <MudCardActions>
-                    <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary" Class="ml-auto">Register</MudButton>
+                    <MudButton Disabled="@(!context.Validate() || !context.IsModified())" ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary" Class="ml-auto">Register</MudButton>
                 </MudCardActions>
             </MudCard>
         </MudItem>

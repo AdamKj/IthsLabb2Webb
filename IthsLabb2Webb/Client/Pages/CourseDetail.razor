@@ -1,4 +1,4 @@
-﻿@page "/api/Course/{id:int}"
+﻿@page "/Course/{id:int}"
 @inject HttpClient _http
 @inject IDialogService _dialogService
 
@@ -27,12 +27,27 @@
             <MudCard>
                 <MudCardContent>
                     <MudTextField Label="Enter your Email"
-                                  @bind-Value="_user.Email" For="@(() => _user.Email)" Required="true"/>
+                                  @bind-Value="_user.Email" For="@(() => _user.Email)" Required="true" RequiredError="Email is required."/>
                 </MudCardContent>
                 <MudCardActions>
-                    <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary" Class="ml-auto">Register</MudButton>
+                    <MudButton ButtonType="ButtonType.Submit" Disabled="@(!context.Validate() || !context.IsModified())" Variant="Variant.Filled" Color="Color.Primary" Class="ml-auto">Register</MudButton>
                 </MudCardActions>
             </MudCard>
+        </MudItem>
+        <MudItem xs="12" sm="5">
+            <MudPaper Class="pa-4 mud-height-full">
+                <MudText Typo="Typo.subtitle2">Validation Summary</MudText>
+                @if (_success)
+                {
+                    <MudText Color="Color.Success">Success</MudText>
+                }
+                else
+                {
+                    <MudText Color="@Color.Error">
+                        <ValidationSummary />
+                    </MudText>
+                }
+            </MudPaper>
         </MudItem>
     </MudGrid>
 </EditForm>
@@ -44,6 +59,7 @@
 
     Course _course = new();
     User _user = new();
+    bool _success;
 
     protected override async Task OnParametersSetAsync()
     {
@@ -53,5 +69,6 @@
     async Task Submit()
     {
         await _http.PostAsJsonAsync($"api/Course/{Id}", _user);
+        _success = true;
     }
 }

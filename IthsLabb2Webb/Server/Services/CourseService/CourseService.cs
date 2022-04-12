@@ -22,7 +22,7 @@ public class CourseService : ICourseService
         var course = _context.Courses.Find(id);
         var getUser = _context.Users.FirstOrDefault(u => u.Email == user.Email);
 
-        if (getUser == null && course == null) return false;
+        if (getUser == null || course == null) return false;
 
         course.Users.Add(getUser);
         getUser.Courses.Add(course);
